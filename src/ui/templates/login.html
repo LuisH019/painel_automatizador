@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Painel Eletrônico</title>
+</head>
+<body>
+    <style>
+        {{CSS_CONTENT}}
+    </style>
+    <div class="content-box">
+        <img src="https://riobrancodosul-saude.ids.inf.br/riobrancodosul/painel/idspaiele.dll/cache/idspaiele_dll/res/__9DC5026FCACE651F689369A7.png" alt="Logo" class="logo">
+        <form id="loginForm">
+            <div class="field">
+                <label>Operador</label>
+                <input type="text" id="username" placeholder="Informe seu operador" required autocomplete="off">
+            </div>
+            <div class="field">
+                <label>Senha</label>
+                <input type="password" id="password" placeholder="Informe sua senha" required>
+            </div>
+            
+            <label class="checkbox-container">
+                <input type="checkbox" id="salvarPadrao">
+                Manter estas credenciais como padrão
+            </label>
+
+            <div class="field">
+                <label>Unidade de Atuação</label>
+                <select id="unidade" required>
+                   {{UNIDADES_OPTIONS}}
+                </select>
+            </div>
+            <button type="submit">Acessar</button>
+        </form>
+    </div>
+
+    <script>
+        {{JS_CONTENT}}
+    </script>
+</body>
+</html>

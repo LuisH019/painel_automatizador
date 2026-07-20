@@ -1,0 +1,5 @@
+PyInstaller==6.21.0
+python-dotenv==1.2.2
+pywin32==311
+screeninfo==0.8.1
+traitlets==5.15.1

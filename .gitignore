@@ -1,0 +1,47 @@
+# Byte-compiled / Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Variáveis de ambiente e segredos
+.env
+.env.*
+
+# Credenciais locais e armazenamento de dados sensíveis
+credentials/
+credentials.json
+
+# Logs da aplicação
+logs/
+*.log
+app.log
+
+# Build & Compilação (PyInstaller e Inno Setup)
+build/
+dist/
+releases/
+*.manifest
+*.spec
+
+# Ambientes virtuais
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Configurações de IDEs e Editores
+.vscode/
+.idea/
+*.suo
+*.user
+*.userossc
+*.sln.docstates
+
+# Arquivos do Sistema Operacional
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store

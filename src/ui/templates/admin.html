@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Configurações do Sistema - MODO ADMIN</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <style>
+        {{CSS_CONTENT}}
+    </style>
+    <div class="content-box">
+        <img src="https://riobrancodosul-saude.ids.inf.br/riobrancodosul/painel/idspaiele.dll/cache/idspaiele_dll/res/__9DC5026FCACE651F689369A7.png" alt="Logo" class="logo">
+        <h2 class="title">Acesso Administrativo Local</h2>
+
+        <p class="subtitle">Alterações aqui refletirão no Registro do Windows (HKLM) desta máquina.</p>
+        
+        <div class="field">
+            <label>URL Base do Painel (idspaiele.dll)</label>
+            <input type="text" id="url" value="{{CURRENT_URL}}">
+        </div>
+        
+        <div class="field">
+            <label>Unidades Disponíveis (Separadas por vírgula)</label>
+            <textarea id="unidades" rows="4">{{CURRENT_UNIDADES}}</textarea>
+        </div>
+
+        <button id="btnSalvar">Gravar no Registro</button>
+
+        <hr style="margin: 25px 0; border: 0; border-top: 1px solid #ccc;">
+        
+        <h2 class="title" style="margin-bottom: 5px;">Controle de Hardware</h2>
+        <p class="subtitle">Status atual do driver de vídeo: <strong>{{STATUS_DRIVER}}</strong></p>
+        
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+            <button id="btnLigarDriver" style="background: #15803d; width: 50%;">Ativar Monitor</button>
+            <button id="btnDesligarDriver" style="background: #334155; width: 50%;">Desativar Monitor</button>
+        </div>
+
+    </div>
+    
+    <script>
+        {{JS_CONTENT}}
+    </script>
+</body>
+</html>

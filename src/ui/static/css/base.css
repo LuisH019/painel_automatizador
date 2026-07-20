@@ -1,0 +1,98 @@
+
+body {
+    font-family: 'Roboto', Arial, sans-serif;
+    background-image: url("https://riobrancodosul-saude.ids.inf.br/riobrancodosul/painel/idspaiele.dll/cache/idspaiele_dll/res/__3587E3128E764997C49FFA58.jpg");
+    background-position: center;   /* Centers horizontally and vertically */
+    background-repeat: no-repeat;
+    overflow: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.content-box {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    width: 320px;
+}
+
+.title, .subtitle {
+    font-family: "Exo 2", sans-serif;
+    text-align: center; 
+    font-style: italic;
+}
+
+.title {
+    color: #b12555;
+    font-weight: 600;
+}
+
+.subtitle {
+    color: #696969;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.logo {
+    display: block;
+    margin: 0 auto 10px auto;
+    width: 150px;
+    height: auto;
+}
+
+.field {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    color: #666;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+input, select, textarea {
+    width: 100%;
+    max-width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 13px;
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    margin: 15px 0;
+    font-size: 13px;
+    color: #696969;
+    cursor: pointer;
+}
+
+.checkbox-container input {
+    width: auto;
+    margin-right: 8px;
+    cursor: pointer;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background: #02525c;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 15px;
+    margin-top: 5px;
+    font-weight: bold;
+}
+
+button:hover {
+    background: #013b42;
+}
