@@ -11,8 +11,6 @@ def main():
         sys.exit(0)
 
     log.info("=== INICIALIZANDO ORQUESTRADOR DO PAINEL ===")
-    from src.drivers.virtual_display import VirtualDisplayManager
-    VirtualDisplayManager.ensure_virtual_display()
 
     # 2. Rota de Auto-Inicialização (GPO/Startup)
     if "--auto" in sys.argv:
@@ -25,6 +23,9 @@ def main():
             
             secure_credentials = SecureCredentials(loaded_data)
             
+            from src.drivers.virtual_display import VirtualDisplayManager
+            VirtualDisplayManager.ensure_virtual_display()
+
             from src.services.automation import AutomationService
             AutomationService.run_panel(secure_credentials)
             sys.exit(0)
@@ -39,6 +40,9 @@ def main():
         log.warning("Execução abortada pelo operador na tela de login.")
         sys.exit(0)
         
+    from src.drivers.virtual_display import VirtualDisplayManager
+    VirtualDisplayManager.ensure_virtual_display()
+
     from src.services.automation import AutomationService
     AutomationService.run_panel(credentials)
 

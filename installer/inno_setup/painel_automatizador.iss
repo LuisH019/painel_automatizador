@@ -1,4 +1,4 @@
-#define Versao "1.3"
+#define Versao "1.4"
 #define NomeApp "Inicializador do Painel IDS"
 #define CaminhoDestinoApp "Inicializador do Painel IDS"
 #define NomeExe "InicializadorPainelIDS"

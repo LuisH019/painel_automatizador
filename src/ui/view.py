@@ -104,5 +104,5 @@ class DesktopWindowManager:
         )
         
         webview.create_window(title=Config.TITULO_APP, html=html_content, js_api=api, width=600, height=600, resizable=False)
-        webview.start(gui='mshtml')
+        webview.start(gui='edgechromium')
         return api.credentials
