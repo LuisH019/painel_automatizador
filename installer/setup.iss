@@ -1,8 +1,8 @@
-#define Versao "1.4"
+#define Versao "1.5"
 #define NomeApp "Inicializador do Painel IDS"
 #define CaminhoDestinoApp "Inicializador do Painel IDS"
 #define NomeExe "InicializadorPainelIDS"
 #define NomeInstalador "InicializadorPainelIDS"
 #define NomePublisher "PMRBS"
 
-#include "base.iss"
+#include "setup_base.iss"

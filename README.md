@@ -21,9 +21,6 @@ painel_automatizador/
 ├── bin/                       # Binários e drivers auxiliares (DevCon, Driver VDD)
 ├── credentials/               # Armazenamento local de credenciais salvas (credentials.json)
 ├── installer/                 # Scripts de compilação e instalação
-│   ├── inno_setup/            # Arquivos de receita do Inno Setup (.iss)
-│   ├── powershell/            # Script PowerShell de automação do build (.ps1)
-│   └── pyinstaller/           # Arquivos spec e scripts auxiliares do PyInstaller
 ├── logs/                      # Histórico de logs rotativos da aplicação
 ├── releases/                  # Instalador executável gerado (.exe)
 ├── src/                       # Código-fonte da aplicação
@@ -64,7 +61,7 @@ Abre a painel de controle administrativo para alterar a URL do sistema alvo, op�
 
 ## 🛠️ Como Compilar o Instalador
 
-Para gerar o arquivo executável de instalação (`Instalador_InicializadorPainelIDS_v1.3.exe`):
+Para gerar o arquivo executável de instalação (`Instalador_InicializadorPainelIDS_v*.exe`):
 
 1. Certifique-se de que o **Inno Setup Compiler (`iscc.exe`)** e o **PyInstaller** estejam instalados no ambiente.
 2. Execute o script de compilação em PowerShell:
@@ -73,7 +70,7 @@ Para gerar o arquivo executável de instalação (`Instalador_InicializadorPaine
 powershell -ExecutionPolicy Bypass -File .\installer\powershell\compilar_painel_automatizador.ps1
 ```
 
-O instalador compilado será gerado na pasta `releases/v1.3/`.
+O instalador compilado será gerado na pasta `releases/v*/`.
 
 ---
 

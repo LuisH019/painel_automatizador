@@ -14,17 +14,27 @@ class Config:
     REGISTRY_PATH = r"SOFTWARE\PMRBS\InicializadorPainelIDS"
 
     @staticmethod
+    def is_compiled() -> bool:
+        """
+        Verifica se a aplicação está empacotada/compilada (PyInstaller ou Nuitka).
+        """
+        return getattr(sys, 'frozen', False) or '__compiled__' in globals()
+
+    @staticmethod
     def _ui_base_path() -> str:
         """
         Retorna o caminho base para os arquivos de UI (templates e estáticos).
-        Se o aplicativo estiver empacotado (frozen), retorna o diretório do executável.
+        Se o aplicativo estiver empacotado, retorna o diretório apropriado.
         Caso contrário, retorna o diretório raiz do projeto.
 
         Returns:
             str: Caminho absoluto para a pasta base de UI.
         """
-        if getattr(sys, 'frozen', False):
-            return sys._MEIPASS
+        if Config.is_compiled():
+            if hasattr(sys, '_MEIPASS'):
+                return sys._MEIPASS
+            else:
+                return os.path.dirname(sys.executable)
         return os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
     
     @staticmethod
@@ -116,7 +126,7 @@ class Config:
             str: Caminho absoluto para o arquivo de template.
         """
         base_path = Config._ui_base_path()
-        if getattr(sys, 'frozen', False):
+        if Config.is_compiled():
             return os.path.join(base_path, "templates", filename)
         return os.path.join(base_path, "ui", "templates", filename)
 
@@ -132,7 +142,7 @@ class Config:
             str: Caminho absoluto para o arquivo estático.
         """
         base_path = Config._ui_base_path()
-        if getattr(sys, 'frozen', False):
+        if Config.is_compiled():
             return os.path.join(base_path, "static", filename)
         return os.path.join(base_path, "ui", "static", filename)
     
@@ -144,7 +154,7 @@ class Config:
         Returns:
             str: Caminho absoluto para o arquivo de credenciais.
         """
-        if getattr(sys, 'frozen', False):
+        if Config.is_compiled():
             base_dir = os.path.join(
                 os.environ.get("LOCALAPPDATA", os.path.expanduser("~")),
                 "PMRBS Inicializador do Painel IDS"
@@ -164,7 +174,7 @@ class Config:
         Returns:
             str: Caminho absoluto para o arquivo de credenciais antigo.
         """
-        if getattr(sys, 'frozen', False):
+        if Config.is_compiled():
             return os.path.join(
                 os.environ.get("LOCALAPPDATA", os.path.expanduser("~")),
                 "PMRBS Inicializador do Painel IDS",

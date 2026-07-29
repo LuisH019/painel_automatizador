@@ -17,15 +17,22 @@ class LoginInterfaceAPI(BaseWebviewAPI):
         """
         Abre a janela de configuração para o administrador.
         """
-        current_dir = os.getcwd() 
-        if getattr(sys, 'frozen', False):
-            executable, params = sys.executable, "--config"
-            current_dir = os.path.dirname(executable)
-        else:   
-            executable, params = sys.executable, "-m src.main --config"
-            current_dir = str(Path(__file__).resolve().parents[2])
+        try:
+            current_dir = os.getcwd() 
+            if getattr(sys, 'frozen', False) or '__compiled__' in globals():
+                executable, params = sys.argv[0], "--config"
+                current_dir = os.path.dirname(os.path.abspath(executable))
+            else:   
+                executable, params = sys.executable, "-m src.main --config"
+                current_dir = str(Path(__file__).resolve().parents[2])
 
-        ctypes.windll.shell32.ShellExecuteW(None, "runas", executable, params, current_dir, 1)
+            ret = ctypes.windll.shell32.ShellExecuteW(None, "runas", executable, params, current_dir, 1)
+            if ret <= 32:
+                from src.core.logger import log
+                log.error(f"Erro ao solicitar elevação (UAC). Código: {ret}")
+        except Exception as e:
+            from src.core.logger import log
+            log.error(f"Falha no ask_admin_config: {e}")
 
     def load_initial_data(self) -> dict: 
         """
@@ -104,5 +111,5 @@ class DesktopWindowManager:
         )
         
         webview.create_window(title=Config.TITULO_APP, html=html_content, js_api=api, width=600, height=600, resizable=False)
-        webview.start(gui='edgechromium')
+        webview.start()
         return api.credentials

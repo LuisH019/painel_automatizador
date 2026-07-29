@@ -33,7 +33,7 @@ def _setup_logger() -> logging.Logger:
     Returns:
         logging.Logger: Instância do logger configurado.
     """
-    if getattr(sys, 'frozen', False):
+    if getattr(sys, 'frozen', False) or '__compiled__' in globals():
         base_dir = os.path.join(
             os.environ.get("LOCALAPPDATA", os.path.expanduser("~")),
             "PMRBS Inicializador do Painel IDS"

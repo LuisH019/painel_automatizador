@@ -23,6 +23,7 @@ dist/
 releases/
 *.manifest
 *.spec
+*.xml
 
 # Ambientes virtuais
 env/
@@ -45,3 +46,9 @@ ehthumbs.db
 Desktop.ini
 $RECYCLE.BIN/
 .DS_Store
+
+test*
+main*/
+main.cmd
+main.exe
+dummy*/
