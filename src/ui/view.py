@@ -7,6 +7,8 @@ from src.core.config import Config
 from src.core.credentials_repo import CredentialsRepository, SecureCredentials
 from src.ui.base_api import BaseWebviewAPI
 from src.utils.template_engine import TemplateEngine
+from src.services.scraper import ScraperService
+from src.core.logger import log
 
 class LoginInterfaceAPI(BaseWebviewAPI):
     def __init__(self):
@@ -42,6 +44,19 @@ class LoginInterfaceAPI(BaseWebviewAPI):
             dict: Dicionário contendo as credenciais salvas, ou None se não houver.
         """
         return CredentialsRepository.load()
+        
+    def fetch_units(self) -> list[str]:
+        """
+        Invocado pelo JS para carregar dinamicamente as unidades.
+        """
+        try:
+            log.info("Recebida requisição JS para fetch_units...")
+            unidades = ScraperService.fetch_units()
+            log.info(f"fetch_units retornando {len(unidades)} unidades ao JS.")
+            return unidades
+        except Exception as e:
+            log.error(f"Erro ao processar fetch_units: {e}")
+            return []
     
     def process_login(self):
         """
@@ -98,16 +113,11 @@ class DesktopWindowManager:
         """
         api = LoginInterfaceAPI()
         
-        app_config = Config.get_app_config()
-        configured_unidades = app_config.get("unidades", [])
-        
-        html_options = "".join([f'<option value="{u.replace('"', '&quot;')}">{u}</option>\n' for u in configured_unidades])
-
         html_content = TemplateEngine.render(
             "login.html", 
             "base.css",
             "login.js",
-            {"UNIDADES_OPTIONS": html_options}
+            {}
         )
         
         webview.create_window(title=Config.TITULO_APP, html=html_content, js_api=api, width=600, height=600, resizable=False)

@@ -6,7 +6,6 @@ __pycache__/
 
 # Variáveis de ambiente e segredos
 .env
-.env.*
 
 # Credenciais locais e armazenamento de dados sensíveis
 credentials/

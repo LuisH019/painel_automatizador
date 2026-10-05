@@ -5,15 +5,14 @@ from src.utils.template_engine import TemplateEngine
 from src.drivers.virtual_display import VirtualDisplayManager # <-- Nova importação
 
 class ConfigAdminAPI(BaseWebviewAPI):
-    def save_settings(self, url: str, unidades: str):
+    def save_settings(self, url: str):
         """
         Recebe os dados da interface HTML e salva no registro do Windows.
         
         Args:
             url (str): A URL do sistema alvo.
-            unidades (str): As unidades separadas por vírgula.
         """
-        success = Config.save_app_config(url, unidades)
+        success = Config.save_app_config(url)
         if success:
             self.show_alert("Configurações salvas no Registro do Windows com sucesso! Reinicie o aplicativo.")
             self.close_window()
@@ -54,7 +53,6 @@ class AdminWindowManager:
             "admin.js",
             {
                 "CURRENT_URL": current_config.get("url", ""),
-                "CURRENT_UNIDADES": ", ".join(current_config.get("unidades", [])),
                 "STATUS_DRIVER": status_driver
             }
         )

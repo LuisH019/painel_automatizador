@@ -7,29 +7,30 @@ Aplicação desenvolvida em Python para automação, autenticação e exibição
 ## 🚀 Recursos Principais
 
 - **Automação Web de Alta Performance**: Utiliza o Playwright para gerenciar o login e navegação em background no navegador Chromium, direcionando a tela para as coordenadas exatas do monitor virtual.
-- **Suporte a Monitor Virtual (VDD)**: Detecção e ativação automatizada de monitor auxiliar virtual (`MttVDD` / DevCon), garantindo isolamento da exibição do painel.
+- **Busca Dinâmica de Unidades (Scraping)**: O sistema não necessita de configuração manual de unidades. Ele utiliza o Playwright em modo invisível (headless) para acessar a URL do painel e extrair dinamicamente a lista de unidades em tempo real durante a tela de login.
+- **Monitor Virtual Inteligente (VDD)**: Instalação automatizada de monitor auxiliar virtual fixado em 1920x1080 (via `MttVDD` / DevCon). O instalador possui travas de segurança via PowerShell para não criar monitores duplicados na máquina.
 - **Segurança de Credenciais (DPAPI)**: Criptografia nativa das senhas utilizando a DPAPI do Windows, armazenando os dados em uma pasta própria e protegida (`credentials/credentials.json`).
-- **Logs Temporais e Rotativos**: Geração de arquivos de log individuais na pasta `logs/` nomeados com a data e hora do início da sessão (`app_YYYY-MM-DD_HH-MM-SS.log`), com limite automático de retenção mantendo apenas as 10 sessões mais recentes.
-- **Inicialização Instantânea**: Empacotamento configurado em modo `onedir` via PyInstaller + Inno Setup, evitando o impacto de desempenho e varreduras do Windows Defender durante a inicialização.
+- **Logs Temporais e Rotativos**: Geração de arquivos de log na pasta `logs/` nomeados com a data e hora, com limite automático de retenção.
+- **Compilação Nuitka**: Empacotado nativamente utilizando o **Nuitka** (substituindo o antigo PyInstaller), entregando máxima performance, execução direta de binários, suporte ao Edge Chromium no WebView2 e menor chance de falsos-positivos em antivírus.
 
 ---
 
 ## 📁 Estrutura do Projeto
 
-```
+```text
 painel_automatizador/
-├── bin/                       # Binários e drivers auxiliares (DevCon, Driver VDD)
+├── bin/                       # Binários e drivers auxiliares (DevCon, Driver VDD, vdd_settings.xml)
 ├── credentials/               # Armazenamento local de credenciais salvas (credentials.json)
-├── installer/                 # Scripts de compilação e instalação
+├── installer/                 # Scripts de compilação (build.py) e Inno Setup (.iss)
 ├── logs/                      # Histórico de logs rotativos da aplicação
 ├── releases/                  # Instalador executável gerado (.exe)
 ├── src/                       # Código-fonte da aplicação
 │   ├── core/                  # Módulos centrais (Config, Logger, Criptografia)
 │   ├── drivers/               # Gerenciador de hardware/display virtual
-│   ├── services/              # Serviços de automação web (Playwright)
-│   ├── ui/                    # Interfaces gráficas PyWebView (HTML, CSS, JS)
+│   ├── services/              # Serviços web (Automação Playwright e ScraperService)
+│   ├── ui/                    # Interfaces gráficas Edge WebView2 (HTML, CSS, JS)
 │   └── main.py                # Ponto de entrada da aplicação
-├── .env                       # Configurações locais e parâmetros globais
+├── .env                       # Configuração opcional de fallback (PAINEL_URL)
 └── requirements.txt           # Dependências Python do projeto
 ```
 
@@ -37,48 +38,45 @@ painel_automatizador/
 
 ## 🖥️ Modos de Execução
 
-O sistema possui diferentes rotas de execução acionadas por flags na linha de comando:
+O sistema possui diferentes rotas de execução acionadas por parâmetros de linha de comando:
 
 ### 1. Modo Padrão (Interface Gráfica de Login)
 ```bash
 python -m src.main
 ```
-Abre a interface gráfica gráfica para o operador inserir usuário, senha e selecionar a unidade de atuação.
+Abre a interface gráfica (WebView2) para o operador inserir usuário e senha. As unidades são carregadas dinamicamente via scraping e a interface trava o botão de acesso até que o carregamento online termine.
 
 ### 2. Modo Autônomo / Auto-Inicialização (`--auto`)
 ```bash
 python -m src.main --auto
 ```
-Indicado para tarefas agendadas, inicialização pelo registro ou GPO. Se houver credenciais completas registradas em `credentials/credentials.json`, o painel é iniciado diretamente de forma silenciosa. Caso contrário, recua para a interface gráfica.
+Indicado para tarefas agendadas ou inicialização via Registro do Windows. Se houver credenciais salvas como padrão, o painel é iniciado silenciosamente no monitor virtual. Caso falte alguma informação, ele recua graciosamente para a interface gráfica.
 
 ### 3. Modo Administrativo / Configurações da TI (`--config`)
 ```bash
 python -m src.main --config
 ```
-Abre a painel de controle administrativo para alterar a URL do sistema alvo, opções de unidades e alternar o status do driver de monitor virtual.
+Abre o painel de controle restrito ao administrador (solicita elevação UAC) para alterar a URL global do sistema alvo e ligar/desligar manualmente o monitor virtual.
 
 ---
 
-## 🛠️ Como Compilar o Instalador
+## 🛠️ Como Compilar e Empacotar
 
-Para gerar o arquivo executável de instalação (`Instalador_InicializadorPainelIDS_v*.exe`):
+A compilação do executável é orquestrada por um script centralizado que lida com o Nuitka e com as cópias de dependências (como os binários do Chromium).
 
-1. Certifique-se de que o **Inno Setup Compiler (`iscc.exe`)** e o **PyInstaller** estejam instalados no ambiente.
-2. Execute o script de compilação em PowerShell:
+1. Certifique-se de que um compilador C (como MinGW64 ou MSVC) esteja configurado no seu sistema para o Nuitka.
+2. Execute o script de build a partir do diretório raiz:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\installer\powershell\compilar_painel_automatizador.ps1
+python installer/build.py
 ```
 
-O instalador compilado será gerado na pasta `releases/v*/`.
+Após a conclusão da compilação na pasta `dist/`, basta abrir o arquivo `installer/setup.iss` no **Inno Setup 6** e executar a compilação do instalador. O instalador finalizado será ejetado na pasta `releases/`.
 
 ---
 
 ## 📋 Requisitos do Sistema
 
-- **OS**: Windows 10 / 11 (x64)
-- **Python**: 3.10 ou superior (para execução em modo de desenvolvimento)
-- **Dependências**:
-  - `playwright` (Chromium)
-  - `pywebview`
-  - `screeninfo`
+- **OS**: Windows 10 / 11 (x64 nativo)
+- **Python**: 3.10 ou superior
+- **Bibliotecas**: `playwright`, `pywebview`, `screeninfo`, `clr_loader`, `pythonnet`

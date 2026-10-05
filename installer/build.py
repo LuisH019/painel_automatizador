@@ -36,6 +36,7 @@ def compilar_nuitka():
         
         # Playwright Configs
         "--nofollow-import-to=playwright",
+        "--no-deployment-flag=excluded-module-usage",
         "--include-module=greenlet",
         "--include-package=pyee",
         "--include-package=typing_extensions",

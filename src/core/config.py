@@ -50,12 +50,10 @@ class Config:
         """
         # 1. Variáveis de Ambiente (.env) - Prioridade Máxima
         env_url = os.getenv("PAINEL_URL")
-        env_unidades = os.getenv("PAINEL_UNIDADES")
         
-        if env_url and env_unidades:
+        if env_url:
             return {
-                "url": env_url,
-                "unidades": [u.strip() for u in env_unidades.split(",")]
+                "url": env_url
             }
 
         # 2. Registro do Windows
@@ -63,10 +61,8 @@ class Config:
             # Tenta abrir a chave no HKEY_LOCAL_MACHINE
             with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, Config.REGISTRY_PATH) as key:
                 reg_url, _ = winreg.QueryValueEx(key, "UrlPainel")
-                reg_unidades_str, _ = winreg.QueryValueEx(key, "Unidades")
                 return {
-                    "url": reg_url,
-                    "unidades": [u.strip() for u in reg_unidades_str.split(",") if u.strip()]
+                    "url": reg_url
                 }
         except WindowsError:
             pass
@@ -81,31 +77,28 @@ class Config:
                 with open(fallback_path, 'r', encoding='utf-8') as f:
                     data = json.load(f)
                     return {
-                        "url": data.get("url", ""),
-                        "unidades": data.get("unidades", [])
+                        "url": data.get("url", "")
                     }
             except Exception:
                 pass
         
         # Default de segurança caso nada esteja configurado
-        return {"url": "", "unidades": []}
+        return {"url": ""}
     
     @staticmethod
-    def save_app_config(url: str, unidades_str: str) -> bool:
+    def save_app_config(url: str) -> bool:
         """
         Salva as configurações de volta no Registro do Windows.
         Requer que o script esteja rodando com privilégios de Administrador.
 
         Args:
             url (str): URL do painel.
-            unidades_str (str): Unidades separadas por vírgula.
         Returns:
             bool: True se salvou com sucesso, False caso contrário.
         """
         try:
             with winreg.CreateKeyEx(winreg.HKEY_LOCAL_MACHINE, Config.REGISTRY_PATH, 0, winreg.KEY_ALL_ACCESS) as key:
                 winreg.SetValueEx(key, "UrlPainel", 0, winreg.REG_SZ, url)
-                winreg.SetValueEx(key, "Unidades", 0, winreg.REG_SZ, unidades_str)
             return True
         except PermissionError:
             log.error("Permissão negada. O aplicativo não foi executado como Administrador.")
