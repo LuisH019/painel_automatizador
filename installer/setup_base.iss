@@ -16,6 +16,11 @@ ArchitecturesInstallIn64BitMode=x64compatible
 [Languages]
 Name: "portuguesebr"; MessagesFile: "compiler:Languages\BrazilianPortuguese.isl"
 
+[Dirs]
+Name: "{commonappdata}\{#NomePublisher} {#NomeApp}"; Permissions: users-modify
+Name: "{commonappdata}\{#NomePublisher} {#NomeApp}\credentials"; Permissions: users-modify
+Name: "{commonappdata}\{#NomePublisher} {#NomeApp}\logs"; Permissions: users-modify
+
 [Files]
 Source: "..\dist\main.dist\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs
 Source: "..\src\ui\static\images\icone.ico"; DestDir: "{app}"

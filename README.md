@@ -1,17 +1,22 @@
 # Painel de Chamamento - Inicializador Autônomo (IDS)
 
-Aplicação desenvolvida em Python para automação, autenticação e exibição contínua do painel web de chamamento em monitores virtuais dedicados.
+Aplicação desenvolvida em Python para automação, autenticação, exibição em monitor virtual dedicado e **transmissão automática via Google Cast (Chromecast / Google TV)** do painel web de chamamento.
 
 ---
 
 ## 🚀 Recursos Principais
 
-- **Automação Web de Alta Performance**: Utiliza o Playwright para gerenciar o login e navegação em background no navegador Chromium, direcionando a tela para as coordenadas exatas do monitor virtual.
-- **Busca Dinâmica de Unidades (Scraping)**: O sistema não necessita de configuração manual de unidades. Ele utiliza o Playwright em modo invisível (headless) para acessar a URL do painel e extrair dinamicamente a lista de unidades em tempo real durante a tela de login.
-- **Monitor Virtual Inteligente (VDD)**: Instalação automatizada de monitor auxiliar virtual fixado em 1920x1080 (via `MttVDD` / DevCon). O instalador possui travas de segurança via PowerShell para não criar monitores duplicados na máquina.
-- **Segurança de Credenciais (DPAPI)**: Criptografia nativa das senhas utilizando a DPAPI do Windows, armazenando os dados em uma pasta própria e protegida (`credentials/credentials.json`).
-- **Logs Temporais e Rotativos**: Geração de arquivos de log na pasta `logs/` nomeados com a data e hora, com limite automático de retenção.
-- **Compilação Nuitka**: Empacotado nativamente utilizando o **Nuitka** (substituindo o antigo PyInstaller), entregando máxima performance, execução direta de binários, suporte ao Edge Chromium no WebView2 e menor chance de falsos-positivos em antivírus.
+- **Transmissão Automática para TVs (Google Cast via CDP & mDNS)**:
+  - **Descoberta Instantânea (mDNS)**: Escaneia todas as interfaces de rede locais via pacotes UDP mDNS (`_googlecast._tcp.local` na porta `5353`) para listar as TVs disponíveis em ~100ms na tela de login, sem precisar abrir o navegador.
+  - **Espelhamento 100% Automatizado (`Cast.startDesktopMirroring`)**: Utiliza o domínio `Cast` do Chrome DevTools Protocol combinado com `--auto-select-desktop-capture-source` e relay mDNS em segundo plano para espelhar automaticamente o monitor virtual na TV escolhida assim que o login é iniciado.
+- **Busca Ultra-Rápida de Unidades (HTTP Keep-Alive + Fallback Playwright)**: Extrai dinamicamente a lista de unidades diretamente do endpoint Ajax do sistema (`idspaiele.dll/HandleEvent`) em ~150ms, mantendo o Playwright em modo headless como fallback automático de contingência.
+- **Persistência e Criptografia no Escopo da Máquina (`ProgramData` + DPAPI)**:
+  - As credenciais, a unidade de atuação e a TV de transmissão são salvas globalmente para o computador em `C:\ProgramData\PMRBS Inicializador do Painel IDS\credentials\credentials.json`.
+  - A senha é protegida pela DPAPI do Windows com a flag `CRYPTPROTECT_LOCAL_MACHINE`, permitindo que **qualquer usuário do Windows** naquela máquina (ou scripts de inicialização via GPO) utilize a configuração padrão salva.
+- **Interface Gráfica Adaptável (WebView2)**: As telas de Login e de Administração se ajustam automaticamente à área útil do monitor (`SPI_GETWORKAREA`), contam com layout responsivo para resoluções menores (ex: `1366x768`) e barra de rolagem integrada.
+- **Monitor Virtual Inteligente (VDD)**: Instalação automatizada de monitor auxiliar virtual fixado em 1920x1080 (via `MttVDD` / DevCon), com verificação via PowerShell no instalador para evitar a criação de monitores duplicados.
+- **Logs Temporais e Rotativos**: Geração de arquivos de log na pasta `logs/` nomeados com data e hora, mantendo automaticamente os 10 registros mais recentes.
+- **Compilação Nativa com Nuitka**: Empacotado em código nativo via **Nuitka** e distribuído com **Inno Setup**, oferecendo inicialização rápida e integração nativa com o Edge WebView2.
 
 ---
 
@@ -20,17 +25,17 @@ Aplicação desenvolvida em Python para automação, autenticação e exibição
 ```text
 painel_automatizador/
 ├── bin/                       # Binários e drivers auxiliares (DevCon, Driver VDD, vdd_settings.xml)
-├── credentials/               # Armazenamento local de credenciais salvas (credentials.json)
-├── installer/                 # Scripts de compilação (build.py) e Inno Setup (.iss)
+├── credentials/               # Armazenamento local de credenciais em ambiente dev (credentials.json)
+├── installer/                 # Scripts de compilação (build.py, build.ps1) e Inno Setup (.iss)
 ├── logs/                      # Histórico de logs rotativos da aplicação
-├── releases/                  # Instalador executável gerado (.exe)
+├── releases/                  # Instaladores executáveis gerados por versão (.exe)
 ├── src/                       # Código-fonte da aplicação
-│   ├── core/                  # Módulos centrais (Config, Logger, Criptografia)
-│   ├── drivers/               # Gerenciador de hardware/display virtual
-│   ├── services/              # Serviços web (Automação Playwright e ScraperService)
-│   ├── ui/                    # Interfaces gráficas Edge WebView2 (HTML, CSS, JS)
-│   └── main.py                # Ponto de entrada da aplicação
-├── .env                       # Configuração opcional de fallback (PAINEL_URL)
+│   ├── core/                  # Módulos centrais (Config, Logger, CredentialsRepository DPAPI)
+│   ├── drivers/               # Gerenciador de hardware/display virtual (VirtualDisplayManager)
+│   ├── services/              # Serviços de automação/Cast (AutomationService) e busca (ScraperService)
+│   ├── ui/                    # Interfaces gráficas Edge WebView2 (HTML, CSS responsivo, JS)
+│   └── main.py                # Ponto de entrada e roteamento de argumentos da aplicação
+├── .env                       # Configuração opcional de ambiente (PAINEL_URL)
 └── requirements.txt           # Dependências Python do projeto
 ```
 
@@ -38,45 +43,51 @@ painel_automatizador/
 
 ## 🖥️ Modos de Execução
 
-O sistema possui diferentes rotas de execução acionadas por parâmetros de linha de comando:
+O sistema possui três rotas de execução acionadas por parâmetros de linha de comando:
 
 ### 1. Modo Padrão (Interface Gráfica de Login)
 ```bash
 python -m src.main
 ```
-Abre a interface gráfica (WebView2) para o operador inserir usuário e senha. As unidades são carregadas dinamicamente via scraping e a interface trava o botão de acesso até que o carregamento online termine.
+Abre a interface gráfica (WebView2) carregando em paralelo e instantaneamente as **Unidades de Atuação** e as **TVs / Dispositivos Cast** disponíveis na rede. O operador pode marcar *"Manter estas credenciais como padrão"* para gravar o operador, senha, unidade e TV para todos os usuários do computador.
 
-### 2. Modo Autônomo / Auto-Inicialização (`--auto`)
+### 2. Modo Autônomo / Inicialização via GPO (`--auto`)
 ```bash
 python -m src.main --auto
 ```
-Indicado para tarefas agendadas ou inicialização via Registro do Windows. Se houver credenciais salvas como padrão, o painel é iniciado silenciosamente no monitor virtual. Caso falte alguma informação, ele recua graciosamente para a interface gráfica.
+Ideal para inicialização automática no logon do Windows (via Registro `Run` ou GPO do Windows Server). Se houver credenciais salvas na máquina (`C:\ProgramData\PMRBS Inicializador do Painel IDS\credentials\credentials.json`), o sistema pula a tela de login, garante o monitor virtual ativo, faz login no painel e inicia a transmissão para a TV automaticamente. Caso não existam credenciais salvas, abre a tela de login normalmente.
 
 ### 3. Modo Administrativo / Configurações da TI (`--config`)
 ```bash
 python -m src.main --config
 ```
-Abre o painel de controle restrito ao administrador (solicita elevação UAC) para alterar a URL global do sistema alvo e ligar/desligar manualmente o monitor virtual.
+Também acessível dando um **duplo clique na logo** na tela de login. Solicita elevação de Administrador (UAC) e permite alterar a URL global do painel no Registro do Windows (`HKLM\SOFTWARE\PMRBS\InicializadorPainelIDS`) e ativar/desativar manualmente o driver do monitor virtual.
 
 ---
 
-## 🛠️ Como Compilar e Empacotar
+## 🛠️ Como Compilar e Gerar o Instalador
 
-A compilação do executável é orquestrada por um script centralizado que lida com o Nuitka e com as cópias de dependências (como os binários do Chromium).
+1. Certifique-se de ter o Python, o **Nuitka** (com compilador C) e o **Inno Setup 6** (`iscc.exe`) instalados.
+2. Para compilar o executável e gerar o instalador completo em um único passo via PowerShell:
 
-1. Certifique-se de que um compilador C (como MinGW64 ou MSVC) esteja configurado no seu sistema para o Nuitka.
-2. Execute o script de build a partir do diretório raiz:
+```powershell
+./installer/build.ps1
+```
+
+Ou execute as etapas separadamente a partir da raiz do projeto:
 
 ```powershell
 python installer/build.py
+iscc.exe installer/setup.iss
 ```
 
-Após a conclusão da compilação na pasta `dist/`, basta abrir o arquivo `installer/setup.iss` no **Inno Setup 6** e executar a compilação do instalador. O instalador finalizado será ejetado na pasta `releases/`.
+O instalador final (`Instalador_InicializadorPainelIDS_v1.7.exe`) será gerado na pasta `releases/v1.7/`.
 
 ---
 
 ## 📋 Requisitos do Sistema
 
-- **OS**: Windows 10 / 11 (x64 nativo)
-- **Python**: 3.10 ou superior
-- **Bibliotecas**: `playwright`, `pywebview`, `screeninfo`, `clr_loader`, `pythonnet`
+- **OS**: Windows 10 / 11 (x64)
+- **Navegador**: Google Chrome (recomendado para suporte completo ao Media Router / Google Cast) ou Microsoft Edge
+- **Python**: 3.10 ou superior (para desenvolvimento/build)
+- **Bibliotecas Principais**: `playwright`, `pywebview`, `screeninfo`, `pywin32` (`win32crypt`), `clr_loader`, `pythonnet`

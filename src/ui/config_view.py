@@ -2,7 +2,7 @@ import webview
 from src.core.config import Config
 from src.ui.base_api import BaseWebviewAPI
 from src.utils.template_engine import TemplateEngine
-from src.drivers.virtual_display import VirtualDisplayManager # <-- Nova importação
+from src.drivers.virtual_display import VirtualDisplayManager
 
 class ConfigAdminAPI(BaseWebviewAPI):
     def save_settings(self, url: str):
@@ -45,7 +45,7 @@ class AdminWindowManager:
         """
         api = ConfigAdminAPI()
         current_config = Config.get_app_config()
-        status_driver = VirtualDisplayManager.status_driver() # <-- Busca o status
+        status_driver = VirtualDisplayManager.status_driver()
         
         html_content = TemplateEngine.render(
             "admin.html", 
@@ -57,5 +57,14 @@ class AdminWindowManager:
             }
         )
 
-        webview.create_window(title="Configuração Avançada - TI", html=html_content, js_api=api, width=900, height=900, resizable=False)
+        win_w, win_h = Config.get_adaptive_window_size(650, 660)
+        webview.create_window(
+            title="Configuração Avançada - TI",
+            html=html_content,
+            js_api=api,
+            width=win_w,
+            height=win_h,
+            resizable=True,
+            min_size=(380, 420)
+        )
         webview.start()

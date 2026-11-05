@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Painel Eletrônico</title>
 </head>
 <body>
@@ -29,6 +30,15 @@
                 <label>Unidade de Atuação</label>
                 <select id="unidade" required>
                 </select>
+            </div>
+
+            <div class="field">
+                <label>TV / Dispositivo de Transmissão (Cast)</label>
+                <div class="select-with-action">
+                    <select id="dispositivoCast">
+                    </select>
+                    <button type="button" id="btnRefreshCast" class="btn-icon" title="Buscar TVs na rede novamente">&#x21bb;</button>
+                </div>
             </div>
             <button type="submit">Acessar</button>
         </form>

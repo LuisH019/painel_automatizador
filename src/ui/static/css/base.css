@@ -1,22 +1,35 @@
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
 
 body {
     font-family: 'Roboto', Arial, sans-serif;
     background-image: url("https://riobrancodosul-saude.ids.inf.br/riobrancodosul/painel/idspaiele.dll/cache/idspaiele_dll/res/__3587E3128E764997C49FFA58.jpg");
-    background-position: center;   /* Centers horizontally and vertically */
+    background-position: center;
     background-repeat: no-repeat;
-    overflow: auto;
+    background-size: cover;
+    background-attachment: fixed;
+    overflow-y: auto;
+    overflow-x: hidden;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
+    flex-direction: column;
+    padding: 16px;
 }
 
 .content-box {
     background: white;
-    padding: 30px;
+    padding: 26px 28px;
     border-radius: 8px;
-    width: 320px;
+    width: 100%;
+    max-width: 380px;
+    margin: auto;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.22);
 }
 
 .title, .subtitle {
@@ -28,23 +41,27 @@ body {
 .title {
     color: #b12555;
     font-weight: 600;
+    margin-top: 6px;
+    margin-bottom: 8px;
 }
 
 .subtitle {
     color: #696969;
     font-size: 14px;
-    margin-bottom: 20px;
+    margin-top: 0;
+    margin-bottom: 18px;
 }
 
 .logo {
     display: block;
     margin: 0 auto 10px auto;
-    width: 150px;
+    width: 145px;
+    max-width: 60%;
     height: auto;
 }
 
 .field {
-    margin-bottom: 15px;
+    margin-bottom: 14px;
 }
 
 label {
@@ -65,10 +82,21 @@ input, select, textarea {
     font-size: 13px;
 }
 
+.select-with-action {
+    display: flex;
+    gap: 6px;
+    align-items: stretch;
+}
+
+.select-with-action select {
+    flex: 1;
+    min-width: 0;
+}
+
 .checkbox-container {
     display: flex;
     align-items: center;
-    margin: 15px 0;
+    margin: 12px 0;
     font-size: 13px;
     color: #696969;
     cursor: pointer;
@@ -93,6 +121,62 @@ button {
     font-weight: bold;
 }
 
+button.btn-icon {
+    width: 40px;
+    margin-top: 0;
+    padding: 0;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
 button:hover {
     background: #013b42;
+}
+
+button:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+/* Adaptação automática para telas/janelas com altura reduzida */
+@media (max-height: 680px) {
+    body {
+        padding: 10px;
+    }
+
+    .content-box {
+        padding: 18px 20px;
+    }
+
+    .logo {
+        width: 115px;
+        margin-bottom: 6px;
+    }
+
+    .field {
+        margin-bottom: 10px;
+    }
+
+    label {
+        font-size: 13px;
+        margin-bottom: 3px;
+    }
+
+    input, select, textarea {
+        padding: 8px;
+        font-size: 12.5px;
+    }
+
+    .checkbox-container {
+        margin: 8px 0;
+        font-size: 12.5px;
+    }
+
+    button {
+        padding: 9px;
+        font-size: 14px;
+    }
 }

@@ -57,6 +57,19 @@ class LoginInterfaceAPI(BaseWebviewAPI):
         except Exception as e:
             log.error(f"Erro ao processar fetch_units: {e}")
             return []
+
+    def fetch_cast_devices(self, force_scan: bool = False) -> list[str]:
+        """
+        Invocado pelo JS para listar as TVs / dispositivos Google Cast disponíveis na rede.
+        """
+        try:
+            log.info(f"Recebida requisição JS para fetch_cast_devices (force_scan={force_scan})...")
+            devices = ScraperService.fetch_cast_devices(force_scan=force_scan)
+            log.info(f"fetch_cast_devices retornando {len(devices)} dispositivo(s) ao JS.")
+            return devices
+        except Exception as e:
+            log.error(f"Erro ao processar fetch_cast_devices: {e}")
+            return []
     
     def process_login(self):
         """
@@ -68,16 +81,17 @@ class LoginInterfaceAPI(BaseWebviewAPI):
             user = webview.windows[0].evaluate_js("document.getElementById('username').value;")
             password = webview.windows[0].evaluate_js("document.getElementById('password').value;")
             unidade = webview.windows[0].evaluate_js("document.getElementById('unidade').value;")
+            dispositivo_cast = webview.windows[0].evaluate_js("document.getElementById('dispositivoCast').value;")
             save_pattern = webview.windows[0].evaluate_js("document.getElementById('salvarPadrao').checked;")
             
-            self._authenticate(user, password, unidade, save_pattern)
+            self._authenticate(user, password, unidade, dispositivo_cast or "", save_pattern)
         except Exception as e:
             from src.core.logger import log
             log.error(f"Erro ao capturar dados do DOM: {e}")
             self.show_alert("Falha de segurança ao ler o formulário.")
 
 
-    def _authenticate(self, user: str, password: str, unidade: str, save_pattern: bool):
+    def _authenticate(self, user: str, password: str, unidade: str, dispositivo_cast: str, save_pattern: bool):
         """
         Recebe as credenciais do usuário, valida e salva se necessário.
 
@@ -85,19 +99,21 @@ class LoginInterfaceAPI(BaseWebviewAPI):
             user (str): Nome de usuário.
             password (str): Senha do usuário.
             unidade (str): Unidade do usuário.
+            dispositivo_cast (str): Nome da TV / dispositivo Cast para espelhamento.
             save_pattern (bool): Indica se as credenciais devem ser salvas.
 
         Returns:
             bool: True se a autenticação for bem-sucedida, False caso contrário.
         """
         if save_pattern:
-            CredentialsRepository.save(user, password, unidade)
+            CredentialsRepository.save(user, password, unidade, dispositivo_cast)
             
         if user and password and unidade:
             credentials = SecureCredentials()
             credentials["usuario"] = user
             credentials["senha"] = password
             credentials["unidade"] = unidade
+            credentials["dispositivo_cast"] = dispositivo_cast
             
             self.credentials = credentials
             self.close_window()
@@ -120,6 +136,15 @@ class DesktopWindowManager:
             {}
         )
         
-        webview.create_window(title=Config.TITULO_APP, html=html_content, js_api=api, width=600, height=600, resizable=False)
+        win_w, win_h = Config.get_adaptive_window_size(600, 640)
+        webview.create_window(
+            title=Config.TITULO_APP,
+            html=html_content,
+            js_api=api,
+            width=win_w,
+            height=win_h,
+            resizable=True,
+            min_size=(380, 420)
+        )
         webview.start()
         return api.credentials
